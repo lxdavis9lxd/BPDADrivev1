@@ -1,0 +1,197 @@
+<%- include('layout', { title: title }) %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/explorer">Explorer</a></li>
+                    <li class="breadcrumb-item"><a href="/editor/<%= file.id %>"><%= file.name %></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Version History</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Version History - <%= file.name %></h5>
+                    <a href="/editor/<%= file.id %>" class="btn btn-sm btn-primary">
+                        <i class="bi bi-pencil-square me-1"></i> Back to Editor
+                    </a>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    <% if (success) { %>
+                        <div class="alert alert-success" role="alert">
+                            <%= success %>
+                        </div>
+                    <% } %>
+
+                    <% if (versions && versions.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Version</th>
+                                        <th>Created</th>
+                                        <th>Comment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% versions.forEach((version, index) => { %>
+                                        <tr>
+                                            <td>v<%= versions.length - index %></td>
+                                            <td><%= version.formattedCreatedAt %></td>
+                                            <td><%= version.comment || 'No comment' %></td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-info" 
+                                                            onclick="previewVersion('<%= file.id %>', '<%= version.id %>')">
+                                                        <i class="bi bi-eye"></i> Preview
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" 
+                                                            onclick="restoreVersion('<%= file.id %>', '<%= version.id %>')">
+                                                        <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                                    </button>
+                                                    <% if (versions.length > 1) { %>
+                                                        <button class="btn btn-sm btn-danger" 
+                                                                onclick="deleteVersion('<%= file.id %>', '<%= version.id %>')">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info" role="alert">
+                            No versions found for this file. Versions are created when you save changes to the file.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Version Preview Modal -->
+<div class="modal fade" id="versionPreviewModal" tabindex="-1" aria-labelledby="versionPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="versionPreviewModalLabel">Version Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="versionPreviewContent" class="border p-3 bg-light">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="restoreVersionBtn">Restore This Version</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Preview a specific version
+    async function previewVersion(fileId, versionId) {
+        try {
+            const previewModal = new bootstrap.Modal(document.getElementById('versionPreviewModal'));
+            previewModal.show();
+            
+            // Set the restore button action
+            const restoreBtn = document.getElementById('restoreVersionBtn');
+            restoreBtn.onclick = function() {
+                restoreVersion(fileId, versionId);
+            };
+            
+            // Get the version content
+            const response = await fetch(`/api/versions/${fileId}/${versionId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('versionPreviewContent').innerHTML = 
+                    `<pre class="mb-0" style="white-space: pre-wrap;">${data.content}</pre>`;
+            } else {
+                document.getElementById('versionPreviewContent').innerHTML = 
+                    `<div class="alert alert-danger">Error loading version content: ${data.message}</div>`;
+            }
+        } catch (error) {
+            console.error('Preview version error:', error);
+            document.getElementById('versionPreviewContent').innerHTML = 
+                '<div class="alert alert-danger">Error loading version content</div>';
+        }
+    }
+    
+    // Restore a specific version
+    async function restoreVersion(fileId, versionId) {
+        if (!confirm('Are you sure you want to restore this version? Current changes will be overwritten.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/versions/${fileId}/${versionId}/restore`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Close modal if open
+                const modal = bootstrap.Modal.getInstance(document.getElementById('versionPreviewModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Redirect to editor
+                window.location.href = `/editor/${fileId}?success=Version restored successfully`;
+            } else {
+                alert(data.message || 'Failed to restore version');
+            }
+        } catch (error) {
+            console.error('Restore version error:', error);
+            alert('An error occurred while restoring the version');
+        }
+    }
+    
+    // Delete a specific version
+    async function deleteVersion(fileId, versionId) {
+        if (!confirm('Are you sure you want to delete this version? This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/versions/${fileId}/${versionId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reload the page
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to delete version');
+            }
+        } catch (error) {
+            console.error('Delete version error:', error);
+            alert('An error occurred while deleting the version');
+        }
+    }
+</script>

@@ -3,6 +3,7 @@
  * Handles file editing functionality
  */
 const { getFileById, updateFile } = require('../services/filesystem.service');
+const { createFileVersion } = require('../services/version.service');
 const { formatDate } = require('../utils/helpers');
 const markdownIt = require('markdown-it')();
 
@@ -72,13 +73,30 @@ const saveFile = async (req, res) => {
     try {
         const { user } = req.session;
         const { fileId } = req.params;
-        const { content } = req.body;
+        const { content, createVersion } = req.body;
         
         if (!fileId) {
             return res.status(400).json({
                 success: false,
                 message: 'File ID is required'
             });
+        }
+        
+        // Get the current file data first
+        const fileData = await getFileById(fileId, user.token);
+        
+        // If content is different, create a version before updating
+        if (createVersion !== false && fileData.content !== content) {
+            try {
+                // Create a version with the current content
+                await createFileVersion(fileId, user.token, {
+                    content: fileData.content,
+                    comment: `Automatic version created on ${new Date().toLocaleString()}`
+                });
+            } catch (versionError) {
+                console.error('Create version error:', versionError);
+                // Continue with save even if version creation fails
+            }
         }
         
         // Update the file content

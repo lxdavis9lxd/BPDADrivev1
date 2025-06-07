@@ -1,35 +1,53 @@
 <%- include('layout', { title, user, error, success, body: `
-<div class="row mb-4">
-    <div class="col-md-6">
-        <h2><i class="bi bi-folder"></i> Explorer</h2>
-        ${
-            isSearchResult ? 
-            `<p class="lead">Search results for: "${searchQuery}"</p>` :
-            `<nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/explorer?path=/">Root</a></li>
-                    ${
-                        currentPath !== '/' ? 
-                        currentPath.split('/').filter(Boolean).map((part, index, array) => {
-                            const path = '/' + array.slice(0, index + 1).join('/');
-                            return `<li class="breadcrumb-item ${index === array.length - 1 ? 'active' : ''}">
-                                ${index === array.length - 1 ? part : `<a href="/explorer?path=${path}">${part}</a>`}
-                            </li>`;
-                        }).join('') : ''
-                    }
-                </ol>
-            </nav>`
-        }
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 mb-4">
+        <div class="list-group">
+            <a href="/explorer" class="list-group-item list-group-item-action active">
+                <i class="bi bi-folder"></i> My Files
+            </a>
+            <a href="/share" class="list-group-item list-group-item-action">
+                <i class="bi bi-people"></i> Shared Files
+            </a>
+            <a href="/trash" class="list-group-item list-group-item-action">
+                <i class="bi bi-trash"></i> Trash
+            </a>
+        </div>
     </div>
-    <div class="col-md-6 text-md-end">
-        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createFolderModal">
-            <i class="bi bi-folder-plus"></i> New Folder
-        </button>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createFileModal">
-            <i class="bi bi-file-earmark-plus"></i> New File
-        </button>
-    </div>
-</div>
+    
+    <!-- Main content -->
+    <div class="col-md-9">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2><i class="bi bi-folder"></i> Explorer</h2>
+                ${
+                    isSearchResult ? 
+                    `<p class="lead">Search results for: "${searchQuery}"</p>` :
+                    `<nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/explorer?path=/">Root</a></li>
+                            ${
+                                currentPath !== '/' ? 
+                                currentPath.split('/').filter(Boolean).map((part, index, array) => {
+                                    const path = '/' + array.slice(0, index + 1).join('/');
+                                    return `<li class="breadcrumb-item ${index === array.length - 1 ? 'active' : ''}">
+                                        ${index === array.length - 1 ? part : `<a href="/explorer?path=${path}">${part}</a>`}
+                                    </li>`;
+                                }).join('') : ''
+                            }
+                        </ol>
+                    </nav>`
+                }
+            </div>
+            <div class="col-md-6 text-md-end">
+                <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createFolderModal">
+                    <i class="bi bi-folder-plus"></i> New Folder
+                </button>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createFileModal">
+                    <i class="bi bi-file-earmark-plus"></i> New File
+                </button>
+            </div>
+        </div>
 
 <div class="row mb-3">
     <div class="col-12">

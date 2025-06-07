@@ -4,6 +4,7 @@
  */
 const { listFiles, createFile, deleteFile, updateFile } = require('../services/filesystem.service');
 const { searchFiles } = require('../services/filesystem.service');
+const { moveToTrash } = require('../services/trash.service');
 const { formatDate, formatFileSize } = require('../utils/helpers');
 const markdownIt = require('markdown-it')();
 
@@ -128,11 +129,12 @@ const deleteFileOrFolder = async (req, res) => {
             });
         }
         
-        await deleteFile(fileId, user.token);
+        // Move to trash instead of permanent deletion
+        await moveToTrash(fileId, user.token);
         
         return res.status(200).json({
             success: true,
-            message: 'Item deleted successfully'
+            message: 'Item moved to trash'
         });
     } catch (error) {
         console.error('Delete file/folder error:', error);
