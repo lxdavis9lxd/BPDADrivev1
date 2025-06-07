@@ -134,10 +134,37 @@ const sanitizeItem = (item) => {
     return sanitized;
 };
 
+/**
+ * Cache a function's results
+ * @param {Function} fn - Function to cache
+ * @param {number} ttl - Time to live in milliseconds
+ */
+const cacheFunction = (fn, ttl = 60000) => {
+    const functionCache = new Map();
+    
+    return function(...args) {
+        const key = JSON.stringify(args);
+        const cached = functionCache.get(key);
+        
+        if (cached && (Date.now() - cached.timestamp) < ttl) {
+            return cached.result;
+        }
+        
+        const result = fn(...args);
+        functionCache.set(key, {
+            result,
+            timestamp: Date.now()
+        });
+        
+        return result;
+    };
+};
+
 module.exports = {
     cacheMiddleware,
     clearCache,
     rateLimit,
     debounce,
-    compressData
+    compressData,
+    cacheFunction
 };

@@ -52,6 +52,7 @@ BDPADrive is a sleek, modern web application that allows users to create, edit, 
 - **Security**: bcryptjs for password hashing, XSS protection headers
 - **Email**: Nodemailer for sending password reset emails
 - **Performance**: Custom caching and rate limiting implementations
+- **Testing**: Jest for unit and integration testing, Supertest for API testing
 
 ## BDPA NHSCC 2025 Requirements Compliance
 
@@ -107,6 +108,16 @@ This application implements all the required features as specified in the BDPA N
    npm run dev
    ```
 
+6. Run tests:
+   ```
+   npm test
+   ```
+   
+   Or use the test script:
+   ```
+   ./run-tests.sh
+   ```
+
 ## Project Structure
 
 - `/src` - Source code
@@ -119,6 +130,10 @@ This application implements all the required features as specified in the BDPA N
   - `/utils` - Helper functions
   - `/views` - EJS templates
   - `app.js` - Application entry point
+- `/tests` - Test files
+  - Unit tests for services and utilities
+  - Integration tests for API endpoints
+  - Functional tests for application features
 
 ## License
 

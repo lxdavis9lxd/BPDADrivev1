@@ -78,9 +78,11 @@ app.get('/', (req, res) => {
 app.use(notFoundHandler); // 404 handler
 app.use(errorHandler);    // Global error handler
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start the server only if this file is run directly (not imported for testing)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
 
 module.exports = app;
