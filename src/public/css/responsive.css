@@ -1,0 +1,155 @@
+/**
+ * Responsive Utilities
+ * Additional styles to ensure responsive design across all viewports
+ */
+
+/* Small devices (phones) */
+@media (max-width: 576px) {
+    .hide-on-small {
+        display: none !important;
+    }
+    
+    .mobile-full-width {
+        width: 100% !important;
+    }
+    
+    .mobile-text-center {
+        text-align: center !important;
+    }
+    
+    .mobile-stack {
+        flex-direction: column !important;
+    }
+    
+    .mobile-margin {
+        margin-top: 1rem !important;
+    }
+    
+    /* Adjust table display for small screens */
+    .table-responsive-custom {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .table-responsive-custom th, 
+    .table-responsive-custom td {
+        white-space: nowrap;
+    }
+    
+    /* Collapsible cards for mobile */
+    .card-header-toggle {
+        cursor: pointer;
+    }
+    
+    /* Adjust modal sizes */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+}
+
+/* Medium devices (tablets) */
+@media (min-width: 577px) and (max-width: 991px) {
+    .hide-on-medium {
+        display: none !important;
+    }
+    
+    .tablet-full-width {
+        width: 100% !important;
+    }
+}
+
+/* Large devices (desktops) */
+@media (min-width: 992px) {
+    .hide-on-large {
+        display: none !important;
+    }
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body.auto-dark-mode {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    body.auto-dark-mode .card {
+        background-color: #1e1e1e;
+        border-color: #333;
+    }
+    
+    body.auto-dark-mode .table {
+        color: #e0e0e0;
+    }
+    
+    body.auto-dark-mode .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.075);
+    }
+    
+    body.auto-dark-mode .modal-content {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+    
+    .container {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* Utility classes for responsive padding and margins */
+.p-responsive {
+    padding: 2rem;
+}
+
+@media (max-width: 576px) {
+    .p-responsive {
+        padding: 1rem;
+    }
+}
+
+.m-responsive {
+    margin: 2rem;
+}
+
+@media (max-width: 576px) {
+    .m-responsive {
+        margin: 1rem;
+    }
+}

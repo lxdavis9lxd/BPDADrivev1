@@ -12,6 +12,9 @@ router.use(isAuthenticated);
 // GET /editor/:fileId - Render editor view for a specific file
 router.get('/:fileId', editorController.getEditorView);
 
+// GET /editor/:fileId/lock - Get lock status for a file
+router.get('/:fileId/lock', editorController.getFileLockStatus);
+
 // POST /editor/:fileId/save - Save file content
 router.post('/:fileId/save', editorController.saveFile);
 

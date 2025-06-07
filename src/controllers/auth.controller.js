@@ -4,6 +4,7 @@
  */
 const { apiClient } = require('../utils/api.config');
 const { handleApiError } = require('../utils/helpers');
+const { generateResetToken, verifyResetToken, resetPassword, sendPasswordResetEmail } = require('../services/email.service');
 
 /**
  * Render the login/registration page
@@ -131,9 +132,139 @@ const logout = (req, res) => {
     });
 };
 
+/**
+ * Render the forgot password page
+ */
+const getForgotPasswordPage = (req, res) => {
+    return res.render('forgot-password', {
+        title: 'BDPADrive - Forgot Password',
+        error: null,
+        success: null
+    });
+};
+
+/**
+ * Handle forgot password request
+ */
+const forgotPassword = async (req, res) => {
+    try {
+        const { username, email } = req.body;
+        
+        if (!username || !email) {
+            return res.render('forgot-password', {
+                title: 'BDPADrive - Forgot Password',
+                error: 'Username and email are required',
+                success: null
+            });
+        }
+        
+        // Generate reset token
+        const resetData = await generateResetToken(username);
+        
+        // Send password reset email
+        await sendPasswordResetEmail(email, username, resetData.token);
+        
+        return res.render('forgot-password', {
+            title: 'BDPADrive - Forgot Password',
+            error: null,
+            success: 'Password reset instructions have been sent to your email.'
+        });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        
+        const errorMessage = error.response?.data?.message || 
+                             'Failed to process your request. Please try again.';
+        
+        return res.render('forgot-password', {
+            title: 'BDPADrive - Forgot Password',
+            error: errorMessage,
+            success: null
+        });
+    }
+};
+
+/**
+ * Render the reset password page
+ */
+const getResetPasswordPage = async (req, res) => {
+    try {
+        const { token } = req.params;
+        
+        // Verify the token
+        await verifyResetToken(token);
+        
+        return res.render('reset-password', {
+            title: 'BDPADrive - Reset Password',
+            token,
+            error: null,
+            success: null
+        });
+    } catch (error) {
+        console.error('Reset password page error:', error);
+        
+        return res.render('error', {
+            message: 'Invalid or expired password reset token',
+            error: { status: 400 }
+        });
+    }
+};
+
+/**
+ * Handle password reset
+ */
+const resetPasswordHandler = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password, confirmPassword } = req.body;
+        
+        if (!password || !confirmPassword) {
+            return res.render('reset-password', {
+                title: 'BDPADrive - Reset Password',
+                token,
+                error: 'Password and confirmation are required',
+                success: null
+            });
+        }
+        
+        if (password !== confirmPassword) {
+            return res.render('reset-password', {
+                title: 'BDPADrive - Reset Password',
+                token,
+                error: 'Passwords do not match',
+                success: null
+            });
+        }
+        
+        // Reset the password
+        await resetPassword(token, password);
+        
+        return res.render('auth', {
+            title: 'BDPADrive - Authentication',
+            error: null,
+            success: 'Your password has been reset successfully. Please login with your new password.'
+        });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        
+        const errorMessage = error.response?.data?.message || 
+                             'Failed to reset password. Please try again.';
+        
+        return res.render('reset-password', {
+            title: 'BDPADrive - Reset Password',
+            token: req.params.token,
+            error: errorMessage,
+            success: null
+        });
+    }
+};
+
 module.exports = {
     getAuthPage,
     login,
     register,
-    logout
+    logout,
+    getForgotPasswordPage,
+    forgotPassword,
+    getResetPasswordPage,
+    resetPasswordHandler
 };

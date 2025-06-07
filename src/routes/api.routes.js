@@ -8,6 +8,10 @@ const { isAuthenticated } = require('../middleware/auth.middleware');
 const { searchFiles } = require('../services/filesystem.service');
 const { getFileVersions } = require('../services/version.service');
 const { formatDate, formatFileSize } = require('../utils/helpers');
+const { cacheMiddleware, rateLimit } = require('../utils/performance');
+
+// Apply rate limiting to prevent abuse
+router.use(rateLimit(100, 60000)); // 100 requests per minute
 
 // Apply authentication middleware to all API routes
 router.use(isAuthenticated);
@@ -15,7 +19,7 @@ router.use(isAuthenticated);
 /**
  * Search files and folders
  */
-router.get('/search', async (req, res) => {
+router.get('/search', cacheMiddleware('search', 30000), async (req, res) => {
     try {
         const { user } = req.session;
         const { query, type, tag } = req.query;
@@ -59,7 +63,7 @@ router.get('/search', async (req, res) => {
 /**
  * Get a specific version's content
  */
-router.get('/versions/:fileId/:versionId', async (req, res) => {
+router.get('/versions/:fileId/:versionId', cacheMiddleware('versions', 60000), async (req, res) => {
     try {
         const { user } = req.session;
         const { fileId, versionId } = req.params;

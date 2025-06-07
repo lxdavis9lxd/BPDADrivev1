@@ -8,6 +8,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const { notFoundHandler, errorHandler, xssProtection } = require('./middleware/error.middleware');
 
 // Initialize Express app
 const app = express();
@@ -28,6 +29,9 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
+
+// Security middleware
+app.use(xssProtection);
 
 // Set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -70,14 +74,9 @@ app.get('/', (req, res) => {
     return res.redirect('/auth');
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).render('error', { 
-        message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? err : {}
-    });
-});
+// Error handling
+app.use(notFoundHandler); // 404 handler
+app.use(errorHandler);    // Global error handler
 
 // Start the server
 app.listen(PORT, () => {

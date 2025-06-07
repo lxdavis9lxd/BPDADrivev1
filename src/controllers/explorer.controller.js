@@ -16,13 +16,19 @@ const getExplorerView = async (req, res) => {
         const { user } = req.session;
         const path = req.query.path || '/';
         const searchQuery = req.query.search;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20; // Default items per page
         
         let filesData;
         let isSearchResult = false;
         
         // If search query is provided, use search function instead of list
         if (searchQuery) {
-            filesData = await searchFiles(user.username, user.token, { query: searchQuery });
+            filesData = await searchFiles(user.username, user.token, { 
+                query: searchQuery,
+                page,
+                limit
+            });
             isSearchResult = true;
         } else {
             // Otherwise get files and folders from the specified path
@@ -49,14 +55,41 @@ const getExplorerView = async (req, res) => {
         directories.sort((a, b) => a.name.localeCompare(b.name));
         files.sort((a, b) => a.name.localeCompare(b.name));
         
+        // Calculate pagination
+        const totalItems = directories.length + files.length;
+        const totalPages = Math.ceil(totalItems / limit);
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        
+        // Get paginated results
+        const paginatedDirectories = directories.slice(
+            startIndex, 
+            Math.min(endIndex, directories.length)
+        );
+        
+        let paginatedFiles = [];
+        if (endIndex > directories.length) {
+            // If we still have space for files after directories
+            const remainingSpace = endIndex - directories.length;
+            paginatedFiles = files.slice(0, remainingSpace);
+        }
+        
         return res.render('explorer', {
             title: 'BDPADrive - Explorer',
             user: user.username,
             currentPath: path,
-            directories,
-            files,
+            directories: paginatedDirectories,
+            files: paginatedFiles,
             isSearchResult,
             searchQuery: searchQuery || '',
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                limit,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            },
             error: null,
             success: null
         });
@@ -69,6 +102,14 @@ const getExplorerView = async (req, res) => {
             currentPath: req.query.path || '/',
             directories: [],
             files: [],
+            pagination: {
+                currentPage: 1,
+                totalPages: 0,
+                totalItems: 0,
+                limit: 20,
+                hasNextPage: false,
+                hasPrevPage: false
+            },
             error: error.message || 'Failed to load files',
             success: null
         });

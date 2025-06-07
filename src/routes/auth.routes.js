@@ -17,4 +17,16 @@ router.post('/register', authController.register);
 // GET /auth/logout - Handle user logout
 router.get('/logout', authController.logout);
 
+// GET /auth/forgot-password - Render forgot password page
+router.get('/forgot-password', authController.getForgotPasswordPage);
+
+// POST /auth/forgot-password - Handle forgot password request
+router.post('/forgot-password', authController.forgotPassword);
+
+// GET /auth/reset-password/:token - Render reset password page
+router.get('/reset-password/:token', authController.getResetPasswordPage);
+
+// POST /auth/reset-password/:token - Handle password reset
+router.post('/reset-password/:token', authController.resetPasswordHandler);
+
 module.exports = router;
