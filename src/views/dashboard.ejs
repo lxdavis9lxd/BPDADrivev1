@@ -1,0 +1,184 @@
+<%- include('layout', { title, user: user.username, error, success, body: `
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-person-circle"></i> Dashboard</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">User Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" value="${user.username}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="userEmail" class="form-control" value="${user.email || ''}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Storage Used</label>
+                    <div class="form-control bg-light">${user.storageUsed}</div>
+                </div>
+                <button id="updateEmailBtn" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Update Email
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Change Password</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" id="newPassword" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control">
+                </div>
+                <button id="changePasswordBtn" class="btn btn-warning">
+                    <i class="bi bi-key"></i> Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Delete Account</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-danger">Warning: This action cannot be undone. All your files and folders will be permanently deleted.</p>
+                <div class="mb-3">
+                    <label for="deletePassword" class="form-label">Password</label>
+                    <input type="password" id="deletePassword" class="form-control">
+                </div>
+                <button id="deleteAccountBtn" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update Email
+    document.getElementById('updateEmailBtn').addEventListener('click', function() {
+        const email = document.getElementById('userEmail').value;
+        
+        if (!email) {
+            alert('Email is required');
+            return;
+        }
+        
+        fetch('/dashboard/email', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Email updated successfully');
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update email');
+        });
+    });
+    
+    // Change Password
+    document.getElementById('changePasswordBtn').addEventListener('click', function() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('All fields are required');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+        
+        fetch('/dashboard/password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                currentPassword,
+                newPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Password changed successfully');
+                // Clear fields
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to change password');
+        });
+    });
+    
+    // Delete Account
+    document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+        const password = document.getElementById('deletePassword').value;
+        
+        if (!password) {
+            alert('Password is required to delete your account');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            return;
+        }
+        
+        fetch('/dashboard/account', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Account deleted successfully');
+                window.location.href = '/auth';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete account');
+        });
+    });
+});
+</script>
+` }) %>

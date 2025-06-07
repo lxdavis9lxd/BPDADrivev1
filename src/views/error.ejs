@@ -1,0 +1,25 @@
+<%- include('layout', { title: 'BDPADrive - Error', error: null, success: null, body: `
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">Error</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="text-center">${message}</h4>
+                
+                <% if (error && error.status) { %>
+                    <p class="text-center text-muted">Status: ${error.status}</p>
+                <% } %>
+                
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>

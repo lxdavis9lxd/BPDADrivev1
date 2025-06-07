@@ -1,0 +1,160 @@
+/* Main styles for BDPADrive */
+
+/* Global styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar styling */
+.navbar-brand img {
+    margin-right: 0.5rem;
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* Explorer view styling */
+.file-item {
+    transition: background-color 0.2s;
+}
+
+.file-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.file-icon {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+/* Editor view styling */
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#fileContent {
+    resize: none;
+    font-family: monospace;
+    min-height: 400px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Loading spinner */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Markdown preview styling */
+.markdown-preview {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+}
+
+.markdown-preview h1, 
+.markdown-preview h2, 
+.markdown-preview h3, 
+.markdown-preview h4, 
+.markdown-preview h5, 
+.markdown-preview h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.markdown-preview blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 1rem;
+    color: #6c757d;
+}
+
+.markdown-preview pre {
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    overflow-x: auto;
+}
+
+.markdown-preview code {
+    font-family: monospace;
+    background-color: #f0f0f0;
+    padding: 0.2rem;
+    border-radius: 0.25rem;
+}
+
+.markdown-preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* File thumbnail styling */
+.file-thumbnail {
+    width: 100%;
+    max-width: 120px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+}
+
+/* Pagination styling */
+.pagination {
+    margin-bottom: 0;
+}
+
+/* Search results styling */
+.search-highlight {
+    background-color: #ffc107;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.25rem;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050;
+}
+
+/* File browser breadcrumb */
+.breadcrumb {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+}
+
+/* Animation for notifications */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
