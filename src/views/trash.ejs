@@ -1,0 +1,167 @@
+<%- include('layout', { title }); %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>
+                <i class="fas fa-trash"></i> Trash
+            </h1>
+            <p class="text-muted">Items in trash will be automatically deleted after 30 days</p>
+        </div>
+        <div class="col-auto">
+            <button id="emptyTrashBtn" class="btn btn-outline-danger">
+                <i class="fas fa-trash-alt"></i> Empty Trash
+            </button>
+        </div>
+    </div>
+
+    <% if (error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+
+    <% if (success) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+
+    <div class="card">
+        <div class="card-body">
+            <% if (files.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-trash fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Trash is empty</h4>
+                    <p class="text-muted">When you delete files, they'll appear here</p>
+                </div>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Original Location</th>
+                                <th>Date Deleted</th>
+                                <th>Size</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% files.forEach(file => { %>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <% if (file.isDirectory) { %>
+                                                <i class="fas fa-folder text-warning me-2"></i>
+                                            <% } else if (file.isFile) { %>
+                                                <i class="fas fa-file text-primary me-2"></i>
+                                            <% } else { %>
+                                                <i class="fas fa-link text-info me-2"></i>
+                                            <% } %>
+                                            <%= file.name %>
+                                        </div>
+                                    </td>
+                                    <td><%= file.originalPath || 'Unknown' %></td>
+                                    <td><%= file.formattedDeletedAt %></td>
+                                    <td><%= file.formattedSize %></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button 
+                                                class="btn btn-sm btn-outline-success" 
+                                                onclick="restoreFile('<%= file.id %>')"
+                                                title="Restore">
+                                                <i class="fas fa-trash-restore"></i>
+                                            </button>
+                                            <button 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                onclick="deleteFilePermanently('<%= file.id %>')"
+                                                title="Delete permanently">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Restore a file from trash
+    async function restoreFile(fileId) {
+        try {
+            const response = await fetch(`/trash/${fileId}/restore`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reload the page
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to restore file');
+            }
+        } catch (error) {
+            console.error('Restore file error:', error);
+            alert('An error occurred while restoring the file');
+        }
+    }
+    
+    // Delete a file permanently
+    async function deleteFilePermanently(fileId) {
+        if (!confirm('Are you sure you want to permanently delete this file? This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/trash/${fileId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reload the page
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to delete file');
+            }
+        } catch (error) {
+            console.error('Delete file error:', error);
+            alert('An error occurred while deleting the file');
+        }
+    }
+    
+    // Empty the trash
+    document.getElementById('emptyTrashBtn').addEventListener('click', async function() {
+        if (!confirm('Are you sure you want to empty the trash? All files will be permanently deleted. This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trash', {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reload the page
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to empty trash');
+            }
+        } catch (error) {
+            console.error('Empty trash error:', error);
+            alert('An error occurred while emptying the trash');
+        }
+    });
+</script>

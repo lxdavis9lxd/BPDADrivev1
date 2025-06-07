@@ -48,6 +48,7 @@ const apiRoutes = require('./routes/api.routes');
 const sharingRoutes = require('./routes/sharing.routes');
 const versionRoutes = require('./routes/version.routes');
 const trashRoutes = require('./routes/trash.routes');
+const profileRoutes = require('./routes/profile.routes');
 
 // Use routes
 app.use('/auth', authRoutes);
@@ -58,6 +59,7 @@ app.use('/api', apiRoutes);
 app.use('/share', sharingRoutes);
 app.use('/versions', versionRoutes);
 app.use('/trash', trashRoutes);
+app.use('/profile', profileRoutes);
 
 // Home route - redirect to explorer or auth based on authentication status
 app.get('/', (req, res) => {

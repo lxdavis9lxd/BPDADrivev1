@@ -1,0 +1,413 @@
+<%- include('layout', { title, user, error, success }); %>
+
+<div class="container mt-4">
+    <h1><i class="bi bi-person-circle"></i> User Profile</h1>
+    
+    <% if (error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+    
+    <% if (success) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+    
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#profile-info" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="bi bi-person"></i> Profile Information
+                </a>
+                <a href="#password" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-key"></i> Change Password
+                </a>
+                <a href="#preferences" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-sliders"></i> Display Preferences
+                </a>
+                <a href="#storage" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="bi bi-hdd"></i> Storage Usage
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Profile Information Tab -->
+                <div class="tab-pane fade show active" id="profile-info">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="displayName" class="form-label">Display Name</label>
+                                        <input type="text" class="form-control" id="displayName" value="<%= profile.displayName || '' %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" value="<%= profile.email || '' %>">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" rows="3"><%= profile.bio || '' %></textarea>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="location" class="form-label">Location</label>
+                                        <input type="text" class="form-control" id="location" value="<%= profile.location || '' %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="organization" class="form-label">Organization</label>
+                                        <input type="text" class="form-control" id="organization" value="<%= profile.organization || '' %>">
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-primary" id="saveProfileBtn">
+                                        <i class="bi bi-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Change Password Tab -->
+                <div class="tab-pane fade" id="password">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Change Password</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="passwordForm">
+                                <div class="mb-3">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" required>
+                                    <div class="form-text">Password must be at least 8 characters long and include a mix of letters, numbers, and special characters.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-primary" id="changePasswordBtn">
+                                        <i class="bi bi-key"></i> Change Password
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Display Preferences Tab -->
+                <div class="tab-pane fade" id="preferences">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Display Preferences</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="preferencesForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Theme</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="theme" id="themeLight" value="light" <%= (preferences.theme === 'light' || !preferences.theme) ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="themeLight">
+                                                Light
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="theme" id="themeDark" value="dark" <%= preferences.theme === 'dark' ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="themeDark">
+                                                Dark
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="theme" id="themeSystem" value="system" <%= preferences.theme === 'system' ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="themeSystem">
+                                                System Default
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Default View</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="defaultView" id="viewList" value="list" <%= (preferences.defaultView === 'list' || !preferences.defaultView) ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="viewList">
+                                                List
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="defaultView" id="viewGrid" value="grid" <%= preferences.defaultView === 'grid' ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="viewGrid">
+                                                Grid
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="itemsPerPage" class="form-label">Items Per Page</label>
+                                    <select class="form-select" id="itemsPerPage">
+                                        <option value="10" <%= (preferences.itemsPerPage === 10 || !preferences.itemsPerPage) ? 'selected' : '' %>>10</option>
+                                        <option value="25" <%= preferences.itemsPerPage === 25 ? 'selected' : '' %>>25</option>
+                                        <option value="50" <%= preferences.itemsPerPage === 50 ? 'selected' : '' %>>50</option>
+                                        <option value="100" <%= preferences.itemsPerPage === 100 ? 'selected' : '' %>>100</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="showThumbnails" <%= preferences.showThumbnails ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="showThumbnails">Show file thumbnails</label>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="confirmDelete" <%= preferences.confirmDelete !== false ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="confirmDelete">Confirm before moving items to trash</label>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-primary" id="savePreferencesBtn">
+                                        <i class="bi bi-save"></i> Save Preferences
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Storage Usage Tab -->
+                <div class="tab-pane fade" id="storage">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Storage Usage</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Total Storage</h6>
+                                <div class="progress">
+                                    <div 
+                                        class="progress-bar" 
+                                        role="progressbar" 
+                                        style="width: <%= profile.storageUsedPercent || 0 %>%"
+                                        aria-valuenow="<%= profile.storageUsedPercent || 0 %>"
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                        <%= profile.storageUsedPercent || 0 %>%
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small><%= profile.storageUsed || '0 KB' %> used</small>
+                                    <small><%= profile.storageTotal || '5 GB' %> total</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Usage by File Type</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>File Type</th>
+                                                <th>Size</th>
+                                                <th>Percentage</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (profile.storageByType) { %>
+                                                <% Object.entries(profile.storageByType).forEach(([type, data]) => { %>
+                                                    <tr>
+                                                        <td><%= type %></td>
+                                                        <td><%= data.size %></td>
+                                                        <td><%= data.percent %>%</td>
+                                                    </tr>
+                                                <% }); %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="3" class="text-center">No storage data available</td>
+                                                </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Save profile information
+    document.getElementById('saveProfileBtn').addEventListener('click', async function() {
+        try {
+            const profileData = {
+                displayName: document.getElementById('displayName').value,
+                email: document.getElementById('email').value,
+                bio: document.getElementById('bio').value,
+                location: document.getElementById('location').value,
+                organization: document.getElementById('organization').value
+            };
+            
+            const response = await fetch('/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(profileData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show success message
+                alert(data.message || 'Profile updated successfully');
+            } else {
+                alert(data.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+            alert('An error occurred while updating profile');
+        }
+    });
+    
+    // Change password
+    document.getElementById('changePasswordBtn').addEventListener('click', async function() {
+        try {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('All password fields are required');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirmation do not match');
+                return;
+            }
+            
+            const response = await fetch('/profile/password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword,
+                    confirmPassword
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show success message and clear form
+                alert(data.message || 'Password changed successfully');
+                document.getElementById('passwordForm').reset();
+            } else {
+                alert(data.message || 'Failed to change password');
+            }
+        } catch (error) {
+            console.error('Change password error:', error);
+            alert('An error occurred while changing password');
+        }
+    });
+    
+    // Save preferences
+    document.getElementById('savePreferencesBtn').addEventListener('click', async function() {
+        try {
+            // Get selected theme
+            const themeRadios = document.getElementsByName('theme');
+            let selectedTheme;
+            for (const radio of themeRadios) {
+                if (radio.checked) {
+                    selectedTheme = radio.value;
+                    break;
+                }
+            }
+            
+            // Get selected default view
+            const viewRadios = document.getElementsByName('defaultView');
+            let selectedView;
+            for (const radio of viewRadios) {
+                if (radio.checked) {
+                    selectedView = radio.value;
+                    break;
+                }
+            }
+            
+            const preferences = {
+                theme: selectedTheme,
+                defaultView: selectedView,
+                itemsPerPage: parseInt(document.getElementById('itemsPerPage').value),
+                showThumbnails: document.getElementById('showThumbnails').checked,
+                confirmDelete: document.getElementById('confirmDelete').checked
+            };
+            
+            const response = await fetch('/profile/preferences', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(preferences)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show success message
+                alert(data.message || 'Preferences updated successfully');
+                
+                // Apply theme if changed
+                if (preferences.theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                }
+            } else {
+                alert(data.message || 'Failed to update preferences');
+            }
+        } catch (error) {
+            console.error('Update preferences error:', error);
+            alert('An error occurred while updating preferences');
+        }
+    });
+    
+    // Apply theme from preferences
+    document.addEventListener('DOMContentLoaded', function() {
+        const theme = '<%= preferences.theme %>';
+        
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else if (theme === 'system') {
+            // Check system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-theme');
+            }
+        }
+    });
+</script>
